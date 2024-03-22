@@ -31,30 +31,29 @@ int main(int argc, char *argv[]) {
     MPI_Win winD2[rows];
 
     double **shared;
-    int d1DispUnit = sizeof(double *);
-    int d2DispUnit = sizeof(double);
-    MPI_Aint d1SharedMemorySize = rows * d1DispUnit;
-    MPI_Aint d2SharedMemorySize = columns * d2DispUnit;
+    int d1DisplacementUnit = sizeof(double *);
+    int d2DisplacementUnit = sizeof(double);
+    MPI_Aint d1SharedMemorySize = rows * d1DisplacementUnit;
+    MPI_Aint d2SharedMemorySize = columns * d2DisplacementUnit;
 
     // Appel collectif de la fonction d'allocation de memoire partagée pour la premiere dimension du tableau
-    MPI_Win_allocate_shared(d1SharedMemorySize, d1DispUnit, MPI_INFO_NULL, MPI_COMM_WORLD, &shared, &win);
+    MPI_Win_allocate_shared(d1SharedMemorySize, d1DisplacementUnit, MPI_INFO_NULL, MPI_COMM_WORLD, &shared, &win);
     // Appel collectif de la fonction d'allocation de memoire partagée pour la deuxieme dimension du tableau
     // Seul le processeur de rang 0 alloue effectivement de la memoire
     for (i = 0; i < rows; i++) {
-        MPI_Win_allocate_shared(rank == 0 ? d2SharedMemorySize : 0, d2DispUnit, MPI_INFO_NULL, MPI_COMM_WORLD, &(shared[i]), &(winD2[i]));
+        MPI_Win_allocate_shared(rank == 0 ? d2SharedMemorySize : 0, d2DisplacementUnit, MPI_INFO_NULL, MPI_COMM_WORLD, &(shared[i]), &(winD2[i]));
     }
 
     if (rank != 0) {
         // Les processeurs de rang different de 0 récupèrent chacun un pointeur vers
         // la memoire allouée sur la deuxieme dimension par le processeur de rang 0
         for (i = 0; i < rows; i++) {
-            MPI_Win_shared_query(winD2[i], 0, &d2SharedMemorySize, &d2DispUnit, &(shared[i]));
+            MPI_Win_shared_query(winD2[i], 0, &d2SharedMemorySize, &d2DisplacementUnit, &(shared[i]));
         }
     }
 
     // Le processeur de rang 0 rempli la matrice de sorte que chaque element a(i,j) contienne la somme i + j;
     if (rank == 0) {
-        // Exclusivité de l'accès à la memoire partagée au processeur de rang 0
         for (i = 0; i < rows; i++) {
             for (j = 0; j < rows; j++) {
                 shared[i][j] = i + j;
@@ -62,10 +61,8 @@ int main(int argc, char *argv[]) {
         }
 
         // Affichage de la matrice avant calcul
-        if (rank == 0) {
-            puts("Matrice avant le calcul");
-            printMatix(shared, rows, columns);
-        }
+        puts("Matrice avant le calcul");
+        printMatix(shared, rows, columns);
     }
 
     // Avant d'effectuer les calculs , on s'assure que le processeur de rang 0
@@ -87,6 +84,9 @@ int main(int argc, char *argv[]) {
         printMatix(shared, rows, columns);
     }
 
+    for (i = 0; i < rows; i++) {
+        MPI_Win_free(&(winD2[i]));
+    }
     MPI_Win_free(&win);
     MPI_Finalize();
     return EXIT_SUCCESS;

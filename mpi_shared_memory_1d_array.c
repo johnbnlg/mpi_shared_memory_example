@@ -17,17 +17,17 @@ int main(int argc, char *argv[]) {
     MPI_Win win;
 
     int *shared;
-    int disp_unit = sizeof(int);
-    MPI_Aint sharedMemorySize = disp_unit * size;
+    int displacementUnit = sizeof(int);
+    MPI_Aint sharedMemorySize = displacementUnit * size;
 
     // Appel collectif de la fonction d'allocation de memoire partagée
     // Seul le processeur de rank 0 alloue effectivement de la memoire
-    MPI_Win_allocate_shared(rank == 0 ? sharedMemorySize : 0, disp_unit, MPI_INFO_NULL, MPI_COMM_WORLD, &shared, &win);
+    MPI_Win_allocate_shared(rank == 0 ? sharedMemorySize : 0, displacementUnit, MPI_INFO_NULL, MPI_COMM_WORLD, &shared, &win);
 
     if (rank != 0) {
         // Les processeurs de rang different de 0 récupèrent chacun un pointeur vers
         // la memoire allouée par le processeur de rang 0
-        MPI_Win_shared_query(win, 0, &sharedMemorySize, &disp_unit, &shared);
+        MPI_Win_shared_query(win, 0, &sharedMemorySize, &displacementUnit, &shared);
     }
 
     // Le processeur de rang 0 rempli la memoire partagée de nombres allant de 1 au nombre de processeurs

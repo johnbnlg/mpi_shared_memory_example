@@ -14,7 +14,12 @@ target_include_directories(mpi_shared_memory_1d_array PRIVATE $ENV{MSMPI_INC})
 target_link_directories(mpi_shared_memory_1d_array PRIVATE $ENV{MSMPI_LIB64})
 
 
-add_executable(mpi_shared_memory_2d_array mpi_shared_memory_2d_array.c)
-target_link_libraries(mpi_shared_memory_2d_array msmpi)
-target_include_directories(mpi_shared_memory_2d_array PRIVATE $ENV{MSMPI_INC})
-target_link_directories(mpi_shared_memory_2d_array PRIVATE $ENV{MSMPI_LIB64})
+add_executable(mpi_shared_memory_2d_array_v1 mpi_shared_memory_2d_array_v1.c)
+target_link_libraries(mpi_shared_memory_2d_array_v1 msmpi)
+target_include_directories(mpi_shared_memory_2d_array_v1 PRIVATE $ENV{MSMPI_INC})
+target_link_directories(mpi_shared_memory_2d_array_v1 PRIVATE $ENV{MSMPI_LIB64})
+
+add_executable(mpi_shared_memory_2d_array_v2 mpi_shared_memory_2d_array_v2.c)
+target_link_libraries(mpi_shared_memory_2d_array_v2 msmpi)
+target_include_directories(mpi_shared_memory_2d_array_v2 PRIVATE $ENV{MSMPI_INC})
+target_link_directories(mpi_shared_memory_2d_array_v2 PRIVATE $ENV{MSMPI_LIB64})
