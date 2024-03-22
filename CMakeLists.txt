@@ -5,7 +5,7 @@ project(mpi_shared_memory_example C)
 set(CMAKE_C_STANDARD 17)
 
 # Specification du fichier a compiler et le nom de notre executable
-add_executable(mpi_shared_memory_example main.c)
+add_executable(mpi_shared_memory_example mpi_shared_memory_example.c)
 
 # Specification de la liaison de notre programme a la bibliotheque MSMPI
 target_link_libraries(mpi_shared_memory_example msmpi)
